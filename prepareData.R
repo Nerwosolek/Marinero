@@ -8,6 +8,14 @@ ships_raw <-
                   col_types = cols(DATETIME = col_datetime(format = "%Y-%m-%dT%H:%M:%SZ"),
                                    date = col_date(format = "%Y-%m-%d"), 
                                    is_parked = col_logical()))
+ships_raw <- rename(ships_raw, SHIPTYPE_ID = SHIPTYPE, 
+              PORT_REPORTED = PORT,
+              PORT_LOCATED = port, 
+              DATE = date,
+              WEEK_NB = week_nb, 
+              SHIP_TYPE_NAME = ship_type, 
+              IS_PARKED = is_parked)
+
 cat(green("Zipped csv read."))
 prev_time = Sys.time()
 prev_time - start_time
@@ -26,9 +34,9 @@ ships <- ungroup(ships)
 ships_LJ <- 
   ships %>% 
   left_join(ships, suffix = c("",".prev"), by = c("SHIP_ID" = "SHIP_ID","prev_pos_nbr" = "pos_nbr")) %>% 
-  select(SHIP_ID, SHIPNAME, LAT, LON, LAT.prev, LON.prev, DATETIME, SHIPTYPE, ship_type, 
-         SPEED, COURSE, HEADING, DESTINATION, PORT, port, FLAG, LENGTH, WIDTH, DWT, 
-         date, week_nb, is_parked, pos_nbr, prev_pos_nbr)
+  select(SHIP_ID, SHIPNAME, LAT, LON, LAT.prev, LON.prev, DATETIME, SHIPTYPE_ID, SHIP_TYPE_NAME, 
+         SPEED, COURSE, HEADING, DESTINATION, PORT_REPORTED, PORT_LOCATED, FLAG, LENGTH, WIDTH, DWT, 
+         DATE, WEEK_NB, IS_PARKED, pos_nbr, prev_pos_nbr)
 rm(ships)
 gc()
 cat(green("Ships prev positions joined."))
@@ -59,5 +67,6 @@ cat(green("Ships longest movement selected."))
 cat(green(Sys.time() - prev_time))
 end_time = Sys.time()
 end_time - start_time
-just_types <- ungroup(ships_moves_max_dist) %>% select(SHIPTYPE, ship_type) %>% unique()
-
+just_types <- ungroup(ships_moves_max_dist) %>% select(SHIPTYPE_ID, SHIP_TYPE_NAME) %>% unique()
+saveRDS(just_types, file = "data/just_types.rds")
+saveRDS(ships_moves_max_dist, file = "data/ships_max_dist.rds")

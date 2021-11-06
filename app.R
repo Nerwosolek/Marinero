@@ -3,21 +3,14 @@ library(shiny.semantic)
 library(dplyr)
 library(leaflet)
 
-#ui <- fluidPage(title = "Marinero",
-#                textOutput(outputId = "hello"))
-
 just_types <- readRDS("data/just_types.rds")
 ships_moves_max_dist <- readRDS("data/ships_max_dist.rds")
 
 marineroGridTempl <- grid_template(
   default = list(
-    # Here we define the data.frame describing our layout
-    # The easiest way is to use rbind so that the layout can be 'visualized' in code
     areas = cbind(
       c("header", "drop_downs", "map")
     ),
-    # Then we define the dimensions of the different elements of the layout
-    # We can use any valid css units to make the layout behave exactly as desired
     rows_height = c("50px", "120px", "400px"),
     cols_width = c("500px")
   ))

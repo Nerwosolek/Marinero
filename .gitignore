@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 /data/*
+rsconnect
+map.R
+adhoc.R

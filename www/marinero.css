@@ -1,0 +1,23 @@
+body {
+  background-color: white;
+  color: black; /* text color */
+}
+
+.myDropdown {
+  text-align: left; 
+  position: static; 
+  padding: 15px;
+}
+
+.myDropdown > h4 {
+  margin: 0px;
+  font-size: 0.9rem;
+}
+div.title {
+  display: flex;
+  justify-content: center;
+}
+.header * {
+  color: red;
+  vertical-align: middle;
+}

@@ -2,7 +2,7 @@ library(shiny)
 library(shiny.semantic)
 library(dplyr)
 library(leaflet)
-source("helpers.R")
+source("map_helpers.R")
 
 just_types <- readRDS("data/just_types.rds")
 ships_moves_max_dist <- readRDS("data/ships_max_dist.rds")
@@ -104,23 +104,22 @@ server <- function(input, output, session){
           df$lng <- c(ship_data_row$LON.prev, ship_data_row$LON)  
           print(df)
           leaflet(data = df) %>%
-          addProviderTiles("CartoDB.Positron") %>%
+          addProviderTiles(map_cfg("map_provider")) %>%
           clearBounds() %>%
-          addCircleMarkers(lng = df$lng[1], lat = df$lat[1], radius = 5, color = "green", popup = pos_popup(ship_data_row)) %>%
-          addCircleMarkers(lng = df$lng[2], lat = df$lat[2], radius = 5, color = "red", popup = pos_popup(ship_data_row, FALSE)) %>%
-          addPolylines(lng = ~lng, lat = ~lat,color = "red", dashArray = "4 8",
-                       weight = 3, popup = move_popup(ship_data_row),
+          addCircleMarkers(lng = df$lng[1], lat = df$lat[1], radius = map_cfg("marker_radius"), 
+                           color = map_cfg("start_color"), popup = pos_popup(ship_data_row)) %>%
+          addCircleMarkers(lng = df$lng[2], lat = df$lat[2], radius = map_cfg("marker_radius"), 
+                           color = map_cfg("end_color"), popup = pos_popup(ship_data_row, FALSE)) %>%
+          addPolylines(lng = ~lng, lat = ~lat,color = map_cfg("dash_color"), dashArray = map_cfg("dash_shape"),
+                       weight = map_cfg("dash_weight"), popup = move_popup(ship_data_row),
                        popupOptions = popupOptions(closeButton = FALSE)) %>%
-            zoom_ctrl_pos("bottomleft")
+            zoom_ctrl_pos("bottomright")
           }
         else {
           leaflet() %>%
-          addProviderTiles("CartoDB.Positron") %>%
+          addProviderTiles(map_cfg("map_provider")) %>%
           setView(lat = 58.5, lng = 19, zoom = 5) %>%
-            htmlwidgets::onRender("
-              function(el, x) {
-                this.zoomControl.setPosition('bottomright')
-              }")
+            zoom_ctrl_pos("bottomright")
         }
       })
   })

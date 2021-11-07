@@ -1,0 +1,22 @@
+pos_popup <- function(data, start = TRUE) {
+  paste(paste0("<U>", ifelse(start, "Start position", "End position"),"</U>"),
+        paste("Lon:",
+              ifelse(start, round(data$LON.prev, 3),round(data$LON, 3)),
+              "Lat:",ifelse(start, round(data$LAT.prev, 3), round(data$LAT, 3))
+              ),
+        paste("Ship name:",data$SHIPNAME), 
+        paste("Speed:",data$SPEED),
+        paste("Course:",data$COURSE),
+        sep = "<BR>")
+}
+
+move_popup <- function(data) {
+  paste("Distance:",round(data$dist, 3))
+}
+
+zoom_ctrl_pos <- function(x, pos) {
+  htmlwidgets::onRender(x, paste0("
+              function(el, x) {
+                this.zoomControl.setPosition('",pos,"')
+              }"))
+}

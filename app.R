@@ -2,6 +2,7 @@ library(shiny)
 library(shiny.semantic)
 library(dplyr)
 library(leaflet)
+source("helpers.R")
 
 just_types <- readRDS("data/just_types.rds")
 ships_moves_max_dist <- readRDS("data/ships_max_dist.rds")
@@ -12,8 +13,8 @@ marineroGridTempl <- grid_template(
     areas = cbind(
       c("header", "drop_downs", "map")
     ),
-    rows_height = c("50px", "120px", "400px"),
-    cols_width = c("500px")
+    rows_height = c("65px", "120px", "400px"),
+    cols_width = c("570px")
   ))
 
 dropdownsGrid <- grid_template(
@@ -30,31 +31,25 @@ ui <- semanticPage(title = "Marinero",
            tags$link(rel = "stylesheet", type = "text/css", href = "marinero.css")
          ),
          grid(marineroGridTempl,
-              container_style = "border: 1px solid; width: 520px;  height: 600px; text-align: center;",
-              area_styles = list(header = "border: 3px solid #5c969e",
-                                 drop_downs = "position: static;"),
-          header = div(class = "title", header("Ships' biggest moves.", description = "",icon = "ship")),
-           drop_downs = grid(dropdownsGrid,
-               area_styles = list(left = "border: 1px solid #5c969e; position:static;",
-                                  right = "border: 1px solid #5c969e; position:static;"),                                        
-             
+          header = segment(class = "title", header("Ships' biggest moves.", description = "",icon = "ship")),
+           drop_downs = segment(grid(dropdownsGrid,
              left = div(class = "myDropdown",
-                               h4("Select type:"),
-                dropdown_input("ship_types_input",
-                              choices = NULL,
-                              choices_value = NULL,
-                              default_text = "Select ship type:"
-                              )),
+                      h4("Select type:"),
+                      dropdown_input("ship_types_input",
+                        choices = NULL,
+                        choices_value = NULL,
+                        default_text = "Select ship type:"
+                      )
+                    ),
              right = div(class = "myDropdown",
-               h4("Select ship name:", description = ""),
+               h4("Select ship name:"),
              dropdown_input("ship_names_input",
                             choices = NULL,
                             choices_value = NULL,
-                            type = "selection",
-                            default_text = "Select ship name:"
+                              default_text = "Select ship name:"
              ))
-           ),
-          map = segment(leafletOutput("map"), class = "raised")
+           )),
+          map = segment(leafletOutput("map"))
          )
     )
 
@@ -111,15 +106,12 @@ server <- function(input, output, session){
           leaflet(data = df) %>%
           addProviderTiles("CartoDB.Positron") %>%
           clearBounds() %>%
-          addCircleMarkers(lng = df$lng[1], lat = df$lat[1], radius = 5, color = "green", popup = ship_data_row$SHIPNAME) %>%
-          addCircleMarkers(lng = df$lng[2], lat = df$lat[2], radius = 5, color = "red", popup = ship_data_row$SHIPNAME) %>%
+          addCircleMarkers(lng = df$lng[1], lat = df$lat[1], radius = 5, color = "green", popup = pos_popup(ship_data_row)) %>%
+          addCircleMarkers(lng = df$lng[2], lat = df$lat[2], radius = 5, color = "red", popup = pos_popup(ship_data_row, FALSE)) %>%
           addPolylines(lng = ~lng, lat = ~lat,color = "red", dashArray = "4 8",
-                       weight = 3, popup = paste("Distance: ",ship_data_row$dist, sep = ""),
+                       weight = 3, popup = move_popup(ship_data_row),
                        popupOptions = popupOptions(closeButton = FALSE)) %>%
-            htmlwidgets::onRender("
-              function(el, x) {
-                this.zoomControl.setPosition('bottomright')
-              }")
+            zoom_ctrl_pos("bottomleft")
           }
         else {
           leaflet() %>%

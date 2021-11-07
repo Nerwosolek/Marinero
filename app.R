@@ -62,9 +62,7 @@ server <- function(input, output, session){
   })
   
   ship_name <- reactive({
-    out <- filter(ships_moves_max_dist, SHIP_ID == input$ship_names_input)  
-    print(out)
-    out
+    filter(ships_moves_max_dist, SHIP_ID == input$ship_names_input)  
   })
   observeEvent(input$ship_types_input, {
     update_dropdown_input(session,
@@ -74,7 +72,6 @@ server <- function(input, output, session){
                           )
   }, once = TRUE)
   observeEvent(ship_type(), {
-    print(paste("ship_type# ",nrow(ship_type())))
     if (nrow(ship_type()) > 0) {
       choices <- ship_type()$SHIPNAME
       choices_values <- ship_type()$SHIP_ID
@@ -85,7 +82,6 @@ server <- function(input, output, session){
       )
     }
     else {
-      print("In else.")
       update_dropdown_input(session,
                             input_id = "ship_names_input",
                             choices = c("-"),
@@ -94,15 +90,14 @@ server <- function(input, output, session){
     }
   })
   
-  observeEvent(ship_name(),{
-    ship_data_row <- ship_name()
-    
     output$map <- renderLeaflet({
-        df <- tibble(.rows = 2)
+      ship_data_row <- ship_name()
+        
         if (nrow(ship_data_row) == 1){
+          df <- tibble(.rows = 2)
           df$lat <- c(ship_data_row$LAT.prev, ship_data_row$LAT)
           df$lng <- c(ship_data_row$LON.prev, ship_data_row$LON)  
-          print(df)
+
           leaflet(data = df) %>%
           addProviderTiles(map_cfg("map_provider")) %>%
           clearBounds() %>%
@@ -121,7 +116,7 @@ server <- function(input, output, session){
           setView(lat = 58.5, lng = 19, zoom = 5) %>%
             zoom_ctrl_pos("bottomright")
         }
-      })
+      
   })
 }
 

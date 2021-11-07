@@ -1,0 +1,19 @@
+.myDropdown {
+  text-align: left; 
+  position: static; 
+  padding: 15px;
+}
+
+.myDropdown > h4 {
+  margin: 0px;
+  font-size: 1.1rem;
+}
+div.title {
+  display: flex;
+  justify-content: center;
+}
+
+.dropdown.icon {
+  background-color: #D7D0CF;
+  border-radius: 5px;
+}
